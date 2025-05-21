@@ -4,6 +4,7 @@ from glob import glob
 from zipfile import ZipFile
 
 import sphn
+import polars
 import gradio as gr
 from audiobox_aesthetics import infer as aes_infer
 
@@ -34,6 +35,11 @@ def extract_zip_and_analyze(archive_name, ce, cu, pc, pq):
 
     gr.Success(f"Unarchived {n_files} files")
 
+    ce_values = []
+    cu_values = []
+    pc_values = []
+    pq_values = []
+
     final_files = []
     for batch in make_batches(forward_value, BATCH_SIZE):
         results = aes_predictor.forward(batch)
@@ -42,6 +48,11 @@ def extract_zip_and_analyze(archive_name, ce, cu, pc, pq):
             filename = batch[idx]["path"]
 
             print(f"{filename} has these metrics: {metrics}")
+
+            ce_values.append(metrics['CE'])
+            cu_values.append(metrics['CU'])
+            pc_values.append(metrics['PC'])
+            pq_values.append(metrics['PQ'])
 
             if metrics["CE"] < ce:
                 print("CE is low")
@@ -76,7 +87,17 @@ def extract_zip_and_analyze(archive_name, ce, cu, pc, pq):
             arc_name = basename(filename)
             zip_file.write(filename, arc_name)
 
-    return archive_name
+    ce_values = polars.DataFrame({'values': ce_values})
+    cu_values = polars.DataFrame({'values': cu_values})
+    pc_values = polars.DataFrame({'values': pc_values})
+    pq_values = polars.DataFrame({'values': pq_values})
+
+    df1 = ce_values['values'].describe()
+    df2 = cu_values['values'].describe()
+    df3 = pc_values['values'].describe()
+    df4 = pq_values['values'].describe()
+
+    return [archive_name, df1, df2, df3, df4]
 
 
 demo = gr.Interface(
@@ -91,7 +112,13 @@ demo = gr.Interface(
         gr.Slider(label="Production Complexity", maximum=10, minimum=0.1, value=1.5),
         gr.Slider(label="Production Quality", maximum=10, minimum=0.1, value=4),
     ],
-    outputs="file",
+    outputs=[
+        gr.File(label='Filtered samples as a ZIP archive'),
+        gr.DataFrame(label='Content Enjoyment stats'),
+        gr.DataFrame(label='Content Usefulness stats'),
+        gr.DataFrame(label='Production Complexity stats'),
+        gr.DataFrame(label='Production Quality stats'),
+    ],
     submit_btn="Inference",
 )
 demo.launch(share=False, server_name="0.0.0.0")

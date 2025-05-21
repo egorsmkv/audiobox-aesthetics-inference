@@ -6,3 +6,4 @@ audiobox_aesthetics
 gradio
 
 sphn
+polars

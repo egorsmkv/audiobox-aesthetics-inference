@@ -1,0 +1,14 @@
+__pycache__/
+
+.ruff_cache/
+.venv/
+.gradio/
+
+chunks/
+tmp/
+
+vad_frame_outputs/
+rttm_outputs/
+
+tmp.zip
+filtered_files.zip

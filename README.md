@@ -1,5 +1,7 @@
 # Audiobox Aesthetics inference
 
+[![CI pipeline](https://github.com/egorsmkv/audiobox-aesthetics-inference/actions/workflows/ci.yml/badge.svg)](https://github.com/egorsmkv/audiobox-aesthetics-inference/actions/workflows/ci.yml)
+
 <img src="./screen.png" alt="screen">
 
 ## Install

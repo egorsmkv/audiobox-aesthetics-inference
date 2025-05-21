@@ -1,5 +1,7 @@
 hf_xet
 
+PySoundFile
+
 audiobox_aesthetics
 gradio
 

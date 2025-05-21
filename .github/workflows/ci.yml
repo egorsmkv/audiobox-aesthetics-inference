@@ -17,6 +17,9 @@ jobs:
           activate-environment: true
           python-version: 3.12
 
+      - name: Install soundfile
+        run: apt-get install -y libsndfile1
+
       - name: Install deps
         run: uv pip install -r requirements.txt
 
